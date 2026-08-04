@@ -20,3 +20,11 @@ USERNAME = os.getenv("EMAIL")
 PASSWORD = os.getenv("PASSWORD")
 
 
+def load_follow_log():
+    if os.path.exists(follow_log_file):
+        try:
+            with open(follow_log_file, "r") as f:
+                return json.load(f)
+        except Exception:
+            return {}
+    return {}
