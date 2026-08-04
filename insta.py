@@ -12,7 +12,7 @@ follow_businesses = False
 maximum_follows_per_session = 5  
 min_unfollow_days = 3 
 max_unfollow_days = 7 
-
+follow_log_file = "follow_log.json" 
 
 client = Client()
 load_dotenv()
@@ -28,3 +28,8 @@ def load_follow_log():
         except Exception:
             return {}
     return {}
+
+
+def save_follow_log(log):
+    with open(follow_log_file, "w") as f:
+        json.dump(log, f, indent=2)    
