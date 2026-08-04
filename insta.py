@@ -33,3 +33,14 @@ def load_follow_log():
 def save_follow_log(log):
     with open(follow_log_file, "w") as f:
         json.dump(log, f, indent=2)    
+
+def record_follow(user_pk, username):
+    log = load_follow_log()
+    wait_days = r.uniform(min_unfollow_days, max_unfollow_days)
+    unfollow_after = datetime.now() + timedelta(days=wait_days)
+    log[str(user_pk)] = {
+        "username": username,
+        "followed_at": datetime.now().isoformat(),
+        "unfollow_after": unfollow_after.isoformat(),
+    }
+    save_follow_log(log)
