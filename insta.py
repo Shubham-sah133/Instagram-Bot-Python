@@ -152,3 +152,25 @@ def unfollow_due_users():
 
         # Delay
         time.sleep(r.uniform(30, 90))
+
+
+def schedule_todays_sessions():
+    schedule.clear("sessions")  # Drop yesterday's slots before creating today's
+
+    num_sessions = r.randint(1, 2)
+    chosen_times = []
+
+    while len(chosen_times) < num_sessions:
+        # Random time of day, kept within waking hours to look natural
+        hour = r.randint(8, 22)
+        minute = r.randint(0, 59)
+        slot = f"{hour:02d}:{minute:02d}"
+        # Avoid two sessions landing in the same hour
+        if all(abs(hour - int(t[:2])) >= 2 for t in chosen_times):
+            chosen_times.append(slot)
+
+    for slot in chosen_times:
+        schedule.every().day.at(slot).do(run_session).tag("sessions")
+
+    print(f"Scheduled {num_sessions} session(s) today at: {', '.join(sorted(chosen_times))}")
+    
