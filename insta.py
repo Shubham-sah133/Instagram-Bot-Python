@@ -44,3 +44,24 @@ def record_follow(user_pk, username):
         "unfollow_after": unfollow_after.isoformat(),
     }
     save_follow_log(log)
+
+def login_user():
+    session_file = "session.json"
+
+    if os.path.exists(session_file):
+        client.load_settings(session_file)
+
+        try:
+            client.login(USERNAME, PASSWORD)
+            client.get_timeline_feed()
+            return
+
+        except Exception as e:
+            old_settings = client.get_settings()
+            client.set_settings({})
+            client.set_uuids(old_settings["uuids"])
+
+    client.login(USERNAME, PASSWORD)
+    client.dump_settings(session_file)
+
+
