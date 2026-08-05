@@ -96,3 +96,36 @@ def check_user(user_id: str):
         return False
 
     return True
+
+def follow_users(num_users: int, hashtag: str):
+    load_following()
+    followings_left = num_users
+
+    while followings_left > 0:
+        medias = client.hashtag_medias_recent(hashtag, num_users * 3)
+
+        for media in medias:
+            if followings_left <= 0:
+                break
+
+            potential_user = media.user
+
+            # Look at each candidate, then pause as if reading their profile
+            if not check_user(potential_user.pk):
+                time.sleep(r.uniform(2, 6))
+                continue
+
+            try:
+                client.user_follow(potential_user.pk)
+                record_follow(potential_user.pk, potential_user.username)
+                followings_left -= 1
+                print(f"Followed {potential_user.username} ({num_users - followings_left}/{num_users})")
+            except Exception as e:
+                print(f"Failed to follow {potential_user.username}: {e}")
+
+            # Long gap between follows
+            time.sleep(r.uniform(30, 90))
+
+        # Wait before pulling next batch of posts
+        if followings_left > 0:
+            time.sleep(r.uniform(120, 300))
