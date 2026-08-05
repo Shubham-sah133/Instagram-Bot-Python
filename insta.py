@@ -129,3 +129,26 @@ def follow_users(num_users: int, hashtag: str):
         # Wait before pulling next batch of posts
         if followings_left > 0:
             time.sleep(r.uniform(120, 300))
+
+
+def unfollow_due_users():
+    log = load_follow_log()
+    now = datetime.now()
+    due = [pk for pk, rec in log.items()
+           if now >= datetime.fromisoformat(rec["unfollow_after"])]
+
+    if not due:
+        return
+
+    for pk in due:
+        username = log[pk]["username"]
+        try:
+            client.user_unfollow(pk)
+            print(f"Unfollowed {username}")
+            del log[pk]  # Remove only on success so failures are retried next pass
+            save_follow_log(log)
+        except Exception as e:
+            print(f"Failed to unfollow {username}: {e}")
+
+        # Delay
+        time.sleep(r.uniform(30, 90))
