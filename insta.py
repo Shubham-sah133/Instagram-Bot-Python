@@ -174,3 +174,16 @@ def schedule_todays_sessions():
 
     print(f"Scheduled {num_sessions} session(s) today at: {', '.join(sorted(chosen_times))}")
     
+login_user()
+
+# Re-roll the day's session times every midnight so they aren't fixed
+schedule.every().day.at("00:01").do(schedule_todays_sessions)
+
+# Lay down today's schedule immediately on startup rather than waiting for midnight
+schedule_todays_sessions()
+
+while True:
+    schedule.run_pending()
+    time.sleep(30)
+
+run_session()    
