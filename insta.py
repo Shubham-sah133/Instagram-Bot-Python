@@ -76,3 +76,23 @@ def load_following():
     except Exception as e:
         print(f"Could not load following list: {e}")
         already_following = set()
+
+def check_user(user_id: str):
+    try:
+        info = client.user_info(user_id)
+    except Exception:
+        return False  # Skip user
+
+    # Skip business/creator accounts unless explicitly allowed
+    if not follow_businesses and info.is_business:
+        return False
+
+    # Only follow accounts under the follower threshold
+    if info.follower_count >= follower_threshold:
+        return False
+
+    # Don't follow people we already follow
+    if str(user_id) in already_following:
+        return False
+
+    return True
