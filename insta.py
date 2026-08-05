@@ -65,3 +65,14 @@ def login_user():
     client.dump_settings(session_file)
 
 
+already_following = set()  # Populated at startup
+
+def load_following():
+    global already_following
+    try:
+        following = client.user_following(client.user_id)  # dict keyed by user_pk
+        already_following = set(str(pk) for pk in following.keys())
+        print(f"Loaded {len(already_following)} existing followings")
+    except Exception as e:
+        print(f"Could not load following list: {e}")
+        already_following = set()
